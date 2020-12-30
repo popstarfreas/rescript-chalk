@@ -15,6 +15,7 @@
     "dev:clean-start": "npx bsb -clean-world && npx bsb -make-world -w"
   },
   "devDependencies": {
+    "@glennsl/bs-jest": "^0.6.0",
     "bs-platform": "^8.4.2"
   },
   "dependencies": {
