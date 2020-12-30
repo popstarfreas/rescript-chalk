@@ -2,36 +2,21 @@ type t
 
 @deriving(jsConverter)
 type level =
-  | @bs.as(0) Disabled
-  | @bs.as(1) Enabled_16Color
-  | @bs.as(2) Enabled_256Color
-  | @bs.as(3) Enabled_TrueColor
-
-let levelFromInt = levelFromJs
-let levelToInt = levelToJs
-
-type instanceOptions = {level: int}
+  | Disabled
+  | Enabled_16Color
+  | Enabled_256Color
+  | Enabled_TrueColor
 
 @module external chalk: t = "chalk"
 
+let levelFromInt: int => option<level>
+let levelToInt: level => int
+
 @bs.get external levelRaw: t => int = "level"
 
-let level: t => option<level> = t => levelFromJs(levelRaw(t))
+let level: t => option<level>
 
-let levelExn: t => level = t => {
-  switch levelFromJs(levelRaw(t)) {
-  | Some(x) => x
-  | None => raise(Failure(j`Chalk.level: Unexpected value for the color support level`))
-  }
-}
-
-@bs.send external newChalkInstance: (t, option<instanceOptions>) => t = "Instance"
-
-let newChalkInstance: (t, ~level: option<level>) => t = (t, ~level) =>
-  switch level {
-  | Some(lvl) => newChalkInstance(t, Some({level: levelToJs(lvl)}))
-  | None => newChalkInstance(t, None)
-  }
+let levelExn: t => level
 
 module type Modifier = {
   @bs.get external reset: t => t = "reset"
@@ -109,11 +94,11 @@ module type BgColorModel = {
   @bs.send external bgAnsi256: (t, int) => t = "bgAnsi256"
 }
 
-module rec Modifier: Modifier = Modifier
-module rec Color: Color = Color
-module rec BgColor: BgColor = BgColor
-module rec ColorModel: ColorModel = ColorModel
-module rec BgColorModel: BgColorModel = BgColorModel
+module Modifier: Modifier
+module Color: Color
+module BgColor: BgColor
+module ColorModel: ColorModel
+module BgColorModel: BgColorModel
 
 include Modifier
 include Color
@@ -124,8 +109,10 @@ include BgColorModel
 external toFunction: (t, . string) => string = "%identity"
 external toFunctionMany: (t, . array<string>) => string = "%identity"
 
-let applyU: (. t, string) => string = (. t, str) => toFunction(t)(. str)
-let applyManyU: (. t, array<string>) => string = (. t, strArray) => toFunctionMany(t)(. strArray)
+let applyU: (. t, string) => string
+let applyManyU: (. t, array<string>) => string
 
-let apply: (t, string) => string = (t, str) => toFunction(t)(. str)
-let applyMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)
+let apply: (t, string) => string
+let applyMany: (t, array<string>) => string
+
+let newChalkInstance: (t, ~level: option<level>) => t
