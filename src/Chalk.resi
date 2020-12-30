@@ -1,6 +1,5 @@
 type t
 
-@deriving(jsConverter)
 type level =
   | Disabled
   | Enabled_16Color
