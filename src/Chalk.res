@@ -1,7 +1,37 @@
 module Impl = {
+
   type t
 
+  @deriving(jsConverter)
+  type level =
+    | @bs.as(0) Disabled
+    | @bs.as(1) Enabled_16Color
+    | @bs.as(2) Enabled_256Color
+    | @bs.as(3) Enabled_TrueColor
+
+  type instanceOptions = {level: int}
+
   @module external chalk: t = "chalk"
+
+  @bs.get external levelInt: t => int = "level"
+
+  let level: t => option<level> = t => levelFromJs(levelInt(t))
+
+  let levelExn: t => level = t => {
+    switch levelFromJs(levelInt(t)) {
+    | Some(x) => x
+    | None => raise(Failure(j`Chalk.level: Unknown color support level`))
+    }
+  }
+
+
+  @bs.send external newChalkInstance: (t, option<instanceOptions>) => t = "Instance"
+
+  let newChalkInstance: (t, ~level: option<level>) => t = (t, ~level) =>
+    switch level {
+    | Some(lvl) => newChalkInstance(t, Some({level: levelToJs(lvl)}))
+    | None => newChalkInstance(t, None)
+    }
 
   module Modifier = {
     @bs.get external reset: t => t = "reset"
