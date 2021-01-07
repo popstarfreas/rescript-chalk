@@ -11,7 +11,9 @@ let style = {
   chalk->greenBright->bgHex("#0055FF")->underline->italic
 }
 
-let styledText = Chalk.apply(style, "Pretty cool!")
+let styledText = Chalk.applyStyle(style, "Pretty cool!")
 
 Js.log(styledText);
 ```
+
+

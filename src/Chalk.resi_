@@ -74,7 +74,7 @@ module type BgColor = {
 module type ColorModel = {
   @bs.send external rgb: (t, ~r: int, ~g: int, ~b: int) => t = "rgb"
   @bs.send external hex: (t, string) => t = "hex"
-  @bs.send external keyword: (t, string) => t = "keyword"
+  let keyword: (t, string) => t
   @bs.send external hsl: (t, ~h: int, ~s: int, ~l: int) => t = "hsl"
   @bs.send external hsv: (t, ~h: int, ~s: int, ~v: int) => t = "hsv"
   @bs.send external hwb: (t, ~h: int, ~w: int, ~b: int) => t = "hwb"
@@ -105,13 +105,10 @@ include BgColor
 include ColorModel
 include BgColorModel
 
-external toFunction: (t, . string) => string = "%identity"
-external toFunctionMany: (t, . array<string>) => string = "%identity"
+let applyStyleU: (. t, string) => string
+let applyStyleManyU: (. t, array<string>) => string
 
-let applyU: (. t, string) => string
-let applyManyU: (. t, array<string>) => string
-
-let apply: (t, string) => string
-let applyMany: (t, array<string>) => string
+let applyStyle: (t, string) => string
+let applyStyleMany: (t, array<string>) => string
 
 let newChalkInstance: (t, ~level: option<level>) => t

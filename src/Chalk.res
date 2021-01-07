@@ -33,7 +33,11 @@ let newChalkInstance: (t, ~level: option<level>) => t = (t, ~level) =>
   | None => newChalkInstance(t, None)
   }
 
-module type Modifier = {
+module Keyword = Chalk__Keyword
+
+type keyword = Keyword.t
+
+module Modifier = {
   @bs.get external reset: t => t = "reset"
   @bs.get external bold: t => t = "bold"
   @bs.get external dim: t => t = "dim"
@@ -45,7 +49,7 @@ module type Modifier = {
   @bs.get external visible: t => t = "visible"
 }
 
-module type Color = {
+module Color = {
   @bs.get external black: t => t = "black"
   @bs.get external red: t => t = "red"
   @bs.get external green: t => t = "green"
@@ -66,7 +70,7 @@ module type Color = {
   @bs.get external whiteBright: t => t = "whiteBright"
 }
 
-module type BgColor = {
+module BgColor = {
   @bs.get external bgBlack: t => t = "bgBlack"
   @bs.get external bgRed: t => t = "bgRed"
   @bs.get external bgGreen: t => t = "bgGreen"
@@ -87,33 +91,35 @@ module type BgColor = {
   @bs.get external bgWhiteBright: t => t = "bgWhiteBright"
 }
 
-module type ColorModel = {
+module ColorModel = {
   @bs.send external rgb: (t, ~r: int, ~g: int, ~b: int) => t = "rgb"
   @bs.send external hex: (t, string) => t = "hex"
-  @bs.send external keyword: (t, string) => t = "keyword"
+  @bs.send external keyword: (t, Keyword.t) => t = "keyword"
   @bs.send external hsl: (t, ~h: int, ~s: int, ~l: int) => t = "hsl"
   @bs.send external hsv: (t, ~h: int, ~s: int, ~v: int) => t = "hsv"
+  let hsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) => switch (t->hsv(~h, ~s, ~v)) {
+    | exception _ => t
+    | value => value
+  }
   @bs.send external hwb: (t, ~h: int, ~w: int, ~b: int) => t = "hwb"
   @bs.send external ansi: (t, int) => t = "ansi"
   @bs.send external ansi256: (t, int) => t = "ansi256"
 }
 
-module type BgColorModel = {
+module BgColorModel = {
   @bs.send external bgRgb: (t, ~r: int, ~g: int, ~b: int) => t = "bgRgb"
   @bs.send external bgHex: (t, string) => t = "bgHex"
-  @bs.send external bgKeyword: (t, string) => t = "bgKeyword"
+  @bs.send external bgKeyword: (t, Keyword.t) => t = "bgKeyword"
   @bs.send external bgHsl: (t, ~h: int, ~s: int, ~l: int) => t = "bgHsl"
   @bs.send external bgHsv: (t, ~h: int, ~s: int, ~v: int) => t = "bgHsv"
+  let bgHsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) => switch (t->bgHsv(~h, ~s, ~v)) {
+    | exception _ => t
+    | value => value
+  }
   @bs.send external bgHwb: (t, ~h: int, ~w: int, ~b: int) => t = "bgHwb"
   @bs.send external bgAnsi: (t, int) => t = "bgAnsi"
   @bs.send external bgAnsi256: (t, int) => t = "bgAnsi256"
 }
-
-module rec Modifier: Modifier = Modifier
-module rec Color: Color = Color
-module rec BgColor: BgColor = BgColor
-module rec ColorModel: ColorModel = ColorModel
-module rec BgColorModel: BgColorModel = BgColorModel
 
 include Modifier
 include Color
@@ -124,8 +130,10 @@ include BgColorModel
 external toFunction: (t, . string) => string = "%identity"
 external toFunctionMany: (t, . array<string>) => string = "%identity"
 
-let applyU: (. t, string) => string = (. t, str) => toFunction(t)(. str)
-let applyManyU: (. t, array<string>) => string = (. t, strArray) => toFunctionMany(t)(. strArray)
+let applyStyleU: (. t, string) => string = (. t, str) => toFunction(t)(. str)
+let applyStyleManyU: (. t, array<string>) => string = (. t, strArray) =>
+  toFunctionMany(t)(. strArray)
 
-let apply: (t, string) => string = (t, str) => toFunction(t)(. str)
-let applyMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)
+let applyStyle: (t, string) => string = (t, str) => toFunction(t)(. str)
+let applyStyleMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)
+

@@ -1,321 +1,686 @@
 open Jest
 open ExpectJs
 
-describe("Chalk Bindings", () => {
-  let text = "Hello World"
-  open Chalk
+let randomSeed = 5230
+Random.init(randomSeed)
 
-  let eval = c => {
-    switch toFunction(c)(. text) {
-    | exception e =>
-      Js.log(e)
-      false
-    | x => Js.typeof(x) === "string"
+module Rand = {
+  %%private(@ocaml.warning("-3") let maxIntRange = Js.Math.pow_int(~base=2, ~exp=30) - 1)
+
+  let x = Js.Math.pow_float(~base=2., ~exp=30.)->int_of_float
+
+  %%private(let maxCodePoint = 0x10ffff)
+
+  %%private(
+    let randomInt = {
+      () => {
+        Random.int(maxIntRange)
+      }
     }
+  )
+
+  %%private(
+    let randomChar = {
+      () => {
+        let codePoint = Random.int(maxCodePoint)
+        Js.String2.fromCodePoint(codePoint)
+      }
+    }
+  )
+
+  %%private(
+    let randomString = {
+      let randomCharU = (. _) => {
+        randomChar()
+      }
+      (~minLength: int, ~maxLength: int) => {
+        let upperBound = maxLength - minLength
+        let size = if upperBound > 0 && upperBound <= maxIntRange {
+          Random.int(upperBound) + minLength
+        } else {
+          1
+        }
+        let arr = Belt.Array.makeByU(size, randomCharU)
+        Js.Array2.joinWith(arr, "")
+      }
+    }
+  )
+
+  let int = randomInt
+  let char = randomChar
+  let string = randomString
+  let bool = Random.bool
+}
+
+let text = "Hello World"
+
+let eval = c => {
+  let x = Chalk.applyStyle(c, text)
+  Js.typeof(x) === "string"
+}
+
+let tryCatch: (unit => 'a) => result<'a, exn> = thunk => {
+  try Ok(thunk()) catch {
+  | err =>
+    Js.log(err)
+    Error(err)
   }
+}
+
+let iterationLimit = 10000
+
+describe("Chalk Bindings", () => {
+  open Belt
 
   test("Chalk.reset", () => {
-    let result = eval(chalk->reset)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->reset)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bold", () => {
-    let result = eval(chalk->bold)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bold)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.dim", () => {
-    let result = eval(chalk->dim)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->dim)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.italic", () => {
-    let result = eval(chalk->italic)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->italic)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.underline", () => {
-    let result = eval(chalk->underline)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->underline)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.inverse", () => {
-    let result = eval(chalk->inverse)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->inverse)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.hidden", () => {
-    let result = eval(chalk->hidden)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->hidden)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.strikethrough", () => {
-    let result = eval(chalk->strikethrough)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->strikethrough)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.visible", () => {
-    let result = eval(chalk->visible)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->visible)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.black", () => {
-    let result = eval(chalk->black)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->black)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.red", () => {
-    let result = eval(chalk->red)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->red)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.green", () => {
-    let result = eval(chalk->green)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->green)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.yellow", () => {
-    let result = eval(chalk->yellow)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->yellow)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.blue", () => {
-    let result = eval(chalk->blue)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->blue)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.magenta", () => {
-    let result = eval(chalk->magenta)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->magenta)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.cyan", () => {
-    let result = eval(chalk->cyan)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->cyan)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.white", () => {
-    let result = eval(chalk->white)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->white)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.blackBright", () => {
-    let result = eval(chalk->blackBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->blackBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.gray", () => {
-    let result = eval(chalk->gray)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->gray)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.grey", () => {
-    let result = eval(chalk->grey)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->grey)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.redBright", () => {
-    let result = eval(chalk->redBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->redBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.greenBright", () => {
-    let result = eval(chalk->greenBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->greenBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.yellowBright", () => {
-    let result = eval(chalk->yellowBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->yellowBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.blueBright", () => {
-    let result = eval(chalk->blueBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->blueBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.magentaBright", () => {
-    let result = eval(chalk->magentaBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->magentaBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.cyanBright", () => {
-    let result = eval(chalk->cyanBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->cyanBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.whiteBright", () => {
-    let result = eval(chalk->whiteBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->whiteBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgBlack", () => {
-    let result = eval(chalk->bgBlack)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgBlack)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgRed", () => {
-    let result = eval(chalk->bgRed)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgRed)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgGreen", () => {
-    let result = eval(chalk->bgGreen)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgGreen)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgYellow", () => {
-    let result = eval(chalk->bgYellow)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgYellow)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgBlue", () => {
-    let result = eval(chalk->bgBlue)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgBlue)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgMagenta", () => {
-    let result = eval(chalk->bgMagenta)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgMagenta)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgCyan", () => {
-    let result = eval(chalk->bgCyan)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgCyan)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgWhite", () => {
-    let result = eval(chalk->bgWhite)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgWhite)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgBlackBright", () => {
-    let result = eval(chalk->bgBlackBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgBlackBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgGray", () => {
-    let result = eval(chalk->bgGray)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgGray)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgGrey", () => {
-    let result = eval(chalk->bgGrey)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgGrey)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgRedBright", () => {
-    let result = eval(chalk->bgRedBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgRedBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgGreenBright", () => {
-    let result = eval(chalk->bgGreenBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgGreenBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgYellowBright", () => {
-    let result = eval(chalk->bgYellowBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgYellowBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgBlueBright", () => {
-    let result = eval(chalk->bgBlueBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgBlueBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgMagentaBright", () => {
-    let result = eval(chalk->bgMagentaBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgMagentaBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgCyanBright", () => {
-    let result = eval(chalk->bgCyanBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgCyanBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgWhiteBright", () => {
-    let result = eval(chalk->bgWhiteBright)
+    open Chalk
+    let result = tryCatch(() => {
+      eval(chalk->bgWhiteBright)
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.rgb", () => {
-    let result = eval(chalk->rgb(~r=0, ~g=0, ~b=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let r = Rand.bool() ? Rand.int() : -Rand.int()
+        let g = Rand.bool() ? Rand.int() : -Rand.int()
+        let b = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->rgb(~r, ~g, ~b)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.hex", () => {
-    let result = eval(chalk->hex("#000000"))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let hexValue = Rand.string(~minLength=0, ~maxLength=100)
+        let style = chalk->hex(hexValue)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.keyword", () => {
-    let result = eval(chalk->keyword("red"))
+    open Chalk
+    module Enum = Chalk__Keyword.Enum
+    let result = tryCatch(() => {
+      let arr = []
+      let rec loop = maybeKw => {
+        switch maybeKw {
+        | Some(kw) =>
+          let style = chalk->keyword(kw)
+          let _: int = Js.Array2.push(arr, eval(style))
+          loop(Enum.next(kw))
+        | None => ()
+        }
+      }
+      loop(Some(Enum.first))
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.hsl", () => {
-    let result = eval(chalk->hsl(~h=0, ~s=0, ~l=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let s = Rand.bool() ? Rand.int() : -Rand.int()
+        let l = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->hsl(~h, ~s, ~l)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.hsv", () => {
-    let result = eval(chalk->hsv(~h=0, ~s=0, ~v=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let s = Rand.bool() ? Rand.int() : -Rand.int()
+        let v = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->hsv(~h, ~s, ~v)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.hwb", () => {
-    let result = eval(chalk->hwb(~h=0, ~w=0, ~b=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let w = Rand.bool() ? Rand.int() : -Rand.int()
+        let b = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->hwb(~h, ~w, ~b)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.ansi", () => {
-    let result = eval(chalk->ansi(0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let ansiValue = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->ansi(ansiValue)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.ansi256", () => {
-    let result = eval(chalk->ansi256(0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let ansi256Value = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->ansi256(ansi256Value)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgRgb", () => {
-    let result = eval(chalk->bgRgb(~r=0, ~g=0, ~b=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let r = Rand.bool() ? Rand.int() : -Rand.int()
+        let g = Rand.bool() ? Rand.int() : -Rand.int()
+        let b = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgRgb(~r, ~g, ~b)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgHex", () => {
-    let result = eval(chalk->bgHex("#000000"))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let hexValue = Rand.string(~minLength=0, ~maxLength=100)
+        let style = chalk->bgHex(hexValue)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgKeyword", () => {
-    let result = eval(chalk->bgKeyword("red"))
+    open Chalk
+    module Enum = Chalk__Keyword.Enum
+    let result = tryCatch(() => {
+      let arr = []
+      let rec loop = maybeKw => {
+        switch maybeKw {
+        | Some(kw) =>
+          let style = chalk->bgKeyword(kw)
+          let _: int = Js.Array2.push(arr, eval(style))
+          loop(Enum.next(kw))
+        | None => ()
+        }
+      }
+      loop(Some(Enum.first))
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgHsl", () => {
-    let result = eval(chalk->bgHsl(~h=0, ~s=0, ~l=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let s = Rand.bool() ? Rand.int() : -Rand.int()
+        let l = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgHsl(~h, ~s, ~l)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgHsv", () => {
-    let result = eval(chalk->bgHsv(~h=0, ~s=0, ~v=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let s = Rand.bool() ? Rand.int() : -Rand.int()
+        let v = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgHsv(~h, ~s, ~v)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgHwb", () => {
-    let result = eval(chalk->bgHwb(~h=0, ~w=0, ~b=0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let h = Rand.bool() ? Rand.int() : -Rand.int()
+        let w = Rand.bool() ? Rand.int() : -Rand.int()
+        let b = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgHwb(~h, ~w, ~b)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgAnsi", () => {
-    let result = eval(chalk->bgAnsi(0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let ansiValue = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgAnsi(ansiValue)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 
   test("Chalk.bgAnsi256", () => {
-    let result = eval(chalk->bgAnsi256(0))
+    open Chalk
+    let result = tryCatch(() => {
+      let arr = []
+      for _ in 1 to iterationLimit {
+        let ansi256Value = Rand.bool() ? Rand.int() : -Rand.int()
+        let style = chalk->bgAnsi256(ansi256Value)
+        let _: int = Js.Array2.push(arr, eval(style))
+      }
+      !Js.Array2.includes(arr, false) && Array.length(arr) > 0
+    })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
   })
 })

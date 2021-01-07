@@ -19,6 +19,9 @@
     "@glennsl/bs-jest": "^0.6.0",
     "bs-platform": "^8.4.2"
   },
+  "peerDependencies": {
+    "bs-platform": "^8.0.0"
+  },
   "dependencies": {
     "chalk": "^4.1.0"
   }
