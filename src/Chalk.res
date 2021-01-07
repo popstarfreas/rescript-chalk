@@ -132,9 +132,9 @@ include BgColorModel
 external toFunction: (t, . string) => string = "%identity"
 external toFunctionMany: (t, . array<string>) => string = "%identity"
 
-let applyStyleU: (. t, string) => string = (. t, str) => toFunction(t)(. str)
-let applyStyleManyU: (. t, array<string>) => string = (. t, strArray) =>
+let applyU: (. t, string) => string = (. t, str) => toFunction(t)(. str)
+let applyManyU: (. t, array<string>) => string = (. t, strArray) =>
   toFunctionMany(t)(. strArray)
 
-let applyStyle: (t, string) => string = (t, str) => toFunction(t)(. str)
-let applyStyleMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)
+let apply: (t, string) => string = (t, str) => toFunction(t)(. str)
+let applyMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)

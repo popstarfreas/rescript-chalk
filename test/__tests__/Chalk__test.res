@@ -7,7 +7,7 @@ let text = "Hello World"
 let iterationLimit = 10000
 
 let eval: Chalk.t => bool = c => {
-  let x = Chalk.applyStyle(c, text)
+  let x = Chalk.apply(c, text)
   Js.typeof(x) === "string"
 }
 

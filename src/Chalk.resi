@@ -307,10 +307,10 @@ let bgHsv: (t, ~h: int, ~s: int, ~v: int) => t
 @bs.send external bgAnsi: (t, int) => t = "bgAnsi"
 @bs.send external bgAnsi256: (t, int) => t = "bgAnsi256"
 
-let applyStyleU: (. t, string) => string
-let applyStyleManyU: (. t, array<string>) => string
+let applyU: (. t, string) => string
+let applyManyU: (. t, array<string>) => string
 
-let applyStyle: (t, string) => string
-let applyStyleMany: (t, array<string>) => string
+let apply: (t, string) => string
+let applyMany: (t, array<string>) => string
 
 let newChalkInstance: (t, ~level: option<level>) => t
