@@ -12,7 +12,7 @@
     "build": "npx bsb -make-world",
     "clean": "npx bsb -clean-world",
     "clean-build": "npx bsb -clean-world && npx bsb -make-world",
-    "clean-start": "npx bsb -clean-world && npx bsb -make-world -w",
+    "clean-start": "npx bsb -clean-world && npx bsb -make-world && npx bsb -w",
     "test": "jest"
   },
   "devDependencies": {
