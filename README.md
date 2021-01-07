@@ -8,12 +8,12 @@ Just start with the base value, `Chalk.chalk`, and then build up the styles you 
 ```rescript
 let style = {
   open Chalk
-  chalk->greenBright->bgHex("#0055FF")->underline->italic
+  chalk->keyword(#palegreen)->bgHsl(~h=260, ~s=60, ~l=50)->italic->bold
 }
 
-let styledText = Chalk.applyStyle(style, "Pretty cool!")
+let fancyText = Chalk.apply(style, "A picture is worth a thousand words")
 
-Js.log(styledText);
+Js.log(fancyText)
 ```
 
 
