@@ -97,10 +97,11 @@ module ColorModel = {
   @bs.send external keyword: (t, Keyword.t) => t = "keyword"
   @bs.send external hsl: (t, ~h: int, ~s: int, ~l: int) => t = "hsl"
   @bs.send external hsv: (t, ~h: int, ~s: int, ~v: int) => t = "hsv"
-  let hsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) => switch (t->hsv(~h, ~s, ~v)) {
+  let hsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) =>
+    switch t->hsv(~h, ~s, ~v) {
     | exception _ => t
     | value => value
-  }
+    }
   @bs.send external hwb: (t, ~h: int, ~w: int, ~b: int) => t = "hwb"
   @bs.send external ansi: (t, int) => t = "ansi"
   @bs.send external ansi256: (t, int) => t = "ansi256"
@@ -112,10 +113,11 @@ module BgColorModel = {
   @bs.send external bgKeyword: (t, Keyword.t) => t = "bgKeyword"
   @bs.send external bgHsl: (t, ~h: int, ~s: int, ~l: int) => t = "bgHsl"
   @bs.send external bgHsv: (t, ~h: int, ~s: int, ~v: int) => t = "bgHsv"
-  let bgHsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) => switch (t->bgHsv(~h, ~s, ~v)) {
+  let bgHsv: (t, ~h: int, ~s: int, ~v: int) => t = (t, ~h, ~s, ~v) =>
+    switch t->bgHsv(~h, ~s, ~v) {
     | exception _ => t
     | value => value
-  }
+    }
   @bs.send external bgHwb: (t, ~h: int, ~w: int, ~b: int) => t = "bgHwb"
   @bs.send external bgAnsi: (t, int) => t = "bgAnsi"
   @bs.send external bgAnsi256: (t, int) => t = "bgAnsi256"
@@ -136,4 +138,3 @@ let applyStyleManyU: (. t, array<string>) => string = (. t, strArray) =>
 
 let applyStyle: (t, string) => string = (t, str) => toFunction(t)(. str)
 let applyStyleMany: (t, array<string>) => string = (t, strArray) => toFunctionMany(t)(. strArray)
-
