@@ -160,17 +160,6 @@ module type S = {
 
   let compare: (t, t) => int
   let cmp: (t, t) => int
-
-  external show: t => string = "%identity"
-
-  module Enum: {
-    let first: t
-    let last: t
-    let next: t => option<t>
-    let prev: t => option<t>
-    let toInt: t => int
-    let fromInt: int => option<t>
-  }
 }
 
 module Impl = {
@@ -330,55 +319,36 @@ module Impl = {
       #yellowgreen,
     ]
 
-    let __map = Js.Dict.empty()
+    let __dict = Js.Dict.empty()
     let __bottomIndex = 0
     let __topIndex = Belt.Array.length(__array) - 1
 
     for i in __bottomIndex to __topIndex {
-      Js.Dict.set(__map, toString(Belt.Array.getUnsafe(__array, i)), i)
+      Js.Dict.set(__dict, toString(Belt.Array.getUnsafe(__array, i)), i)
     }
   }
 
   let fromString = str => {
     open Internal
-    switch Js.Dict.get(__map, str) {
+    switch Js.Dict.get(__dict, str) {
     | None => None
     | Some(index) => Some(Belt.Array.getUnsafe(__array, index))
     }
   }
 
-  external show: t => string = "%identity"
-
   let equal: (t, t) => bool = (a, b) => a === b
   let eq = equal
 
-  let compare: (t, t) => int = Pervasives.compare
-  let cmp = compare
-
-  module Enum = {
-    open Internal
-
-    let first: t = #aliceblue
-    let last: t = #yellowgreen
-
-    let next: t => option<t> = t => {
-      let index = Js.Dict.unsafeGet(__map, toString(t))
-      Belt.Array.get(__array, index + 1)
-    }
-
-    let prev: t => option<t> = t => {
-      let index = Js.Dict.unsafeGet(__map, toString(t))
-      Belt.Array.get(__array, index - 1)
-    }
-
-    let fromInt: int => option<t> = n => {
-      Belt.Array.get(__array, n)
-    }
-
-    let toInt: t => int = t => {
-      Js.Dict.unsafeGet(__map, toString(t))
+  let compare: (t, t) => int = (a, b) => {
+    if a === b {
+      0
+    } else if a < b {
+      -1
+    } else {
+      1
     }
   }
+  let cmp = compare
 }
 
 include (Impl: S)

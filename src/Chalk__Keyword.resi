@@ -158,17 +158,6 @@ let eq: (t, t) => bool
 let compare: (t, t) => int
 let cmp: (t, t) => int
 
-external show: t => string = "%identity"
-
-module Enum: {
-  let first: t
-  let last: t
-  let next: t => option<t>
-  let prev: t => option<t>
-  let toInt: t => int
-  let fromInt: int => option<t>
-}
-
 module type S = {
   type t = t
 
@@ -182,14 +171,4 @@ module type S = {
   let compare: (t, t) => int
   let cmp: (t, t) => int
 
-  external show: t => string = "%identity"
-
-  module Enum: {
-    let first: t
-    let last: t
-    let next: t => option<t>
-    let prev: t => option<t>
-    let toInt: t => int
-    let fromInt: int => option<t>
-  }
 }

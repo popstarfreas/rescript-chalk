@@ -1,76 +1,53 @@
+open Belt
 open Jest
 open ExpectJs
-
-let randomSeed = 5230
-Random.init(randomSeed)
-
-module Rand = {
-  %%private(@ocaml.warning("-3") let maxIntRange = Js.Math.pow_int(~base=2, ~exp=30) - 1)
-
-  let x = Js.Math.pow_float(~base=2., ~exp=30.)->int_of_float
-
-  %%private(let maxCodePoint = 0x10ffff)
-
-  %%private(
-    let randomInt = {
-      () => {
-        Random.int(maxIntRange)
-      }
-    }
-  )
-
-  %%private(
-    let randomChar = {
-      () => {
-        let codePoint = Random.int(maxCodePoint)
-        Js.String2.fromCodePoint(codePoint)
-      }
-    }
-  )
-
-  %%private(
-    let randomString = {
-      let randomCharU = (. _) => {
-        randomChar()
-      }
-      (~minLength: int, ~maxLength: int) => {
-        let upperBound = maxLength - minLength
-        let size = if upperBound > 0 && upperBound <= maxIntRange {
-          Random.int(upperBound) + minLength
-        } else {
-          1
-        }
-        let arr = Belt.Array.makeByU(size, randomCharU)
-        Js.Array2.joinWith(arr, "")
-      }
-    }
-  )
-
-  let int = randomInt
-  let char = randomChar
-  let string = randomString
-  let bool = Random.bool
-}
+open Chalk__TestUtils
 
 let text = "Hello World"
+let iterationLimit = 10000
 
-let eval = c => {
+let eval: Chalk.t => bool = c => {
   let x = Chalk.applyStyle(c, text)
   Js.typeof(x) === "string"
 }
 
-let tryCatch: (unit => 'a) => result<'a, exn> = thunk => {
-  try Ok(thunk()) catch {
-  | err =>
-    Js.log(err)
-    Error(err)
-  }
-}
-
-let iterationLimit = 10000
-
 describe("Chalk Bindings", () => {
-  open Belt
+  test("'Chalk.level' returns 'Some(level)'", () => {
+    open Chalk
+    let lvl = chalk->level
+    expect(Belt.Option.isSome(lvl)) |> toBe(true)
+  })
+
+  test("'Chalk.levelRaw' returns an integer between 0 and 3 (inclusive)", () => {
+    open Chalk
+    let lvl = chalk->levelRaw
+    let isInt =
+      Js.typeof(lvl) === "number" && float_of_int(lvl) === Js.Math.floor_float(float_of_int(lvl))
+    let isInRange = lvl >= 0 && lvl <= 3
+    expect((isInt, isInRange)) |> toEqual((true, true))
+  })
+
+  test("'Chalk.levelExn' does not raise an exception", () => {
+    open Chalk
+    let result = switch levelExn(chalk) {
+    | exception e =>
+      Js.log(e)
+      false
+    | _ => true
+    }
+    expect(result) |> toBe(true)
+  })
+
+  test("Color support level is parsed correctly", () => {
+    open Chalk
+    let lvl = levelExn(chalk)
+    let lvlInt = levelRaw(chalk)
+    let result = switch levelFromInt(lvlInt) {
+    | None => false
+    | Some(parsedLvl) => lvl == parsedLvl
+    }
+    expect(result) |> toBe(true)
+  })
 
   test("Chalk.reset", () => {
     open Chalk
@@ -464,19 +441,12 @@ describe("Chalk Bindings", () => {
 
   test("Chalk.keyword", () => {
     open Chalk
-    module Enum = Chalk__Keyword.Enum
     let result = tryCatch(() => {
       let arr = []
-      let rec loop = maybeKw => {
-        switch maybeKw {
-        | Some(kw) =>
-          let style = chalk->keyword(kw)
-          let _: int = Js.Array2.push(arr, eval(style))
-          loop(Enum.next(kw))
-        | None => ()
-        }
-      }
-      loop(Some(Enum.first))
+      Array.forEachU(keywordArray, (. kw) => {
+        let style = chalk->keyword(kw)
+        let _: int = Js.Array2.push(arr, eval(style))
+      })
       !Js.Array2.includes(arr, false) && Array.length(arr) > 0
     })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
@@ -590,19 +560,12 @@ describe("Chalk Bindings", () => {
 
   test("Chalk.bgKeyword", () => {
     open Chalk
-    module Enum = Chalk__Keyword.Enum
     let result = tryCatch(() => {
       let arr = []
-      let rec loop = maybeKw => {
-        switch maybeKw {
-        | Some(kw) =>
-          let style = chalk->bgKeyword(kw)
-          let _: int = Js.Array2.push(arr, eval(style))
-          loop(Enum.next(kw))
-        | None => ()
-        }
-      }
-      loop(Some(Enum.first))
+      Array.forEachU(keywordArray, (. kw) => {
+        let style = chalk->bgKeyword(kw)
+        let _: int = Js.Array2.push(arr, eval(style))
+      })
       !Js.Array2.includes(arr, false) && Array.length(arr) > 0
     })->Result.getWithDefault(false)
     expect(result) |> toBe(true)
