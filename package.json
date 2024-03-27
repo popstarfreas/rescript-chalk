@@ -3,24 +3,21 @@
   "version": "1.0.0",
   "description": "ReScript bindings to the 'Chalk' string style library",
   "main": "index.js",
-  "repository": "git@github.com:austindd/rescript-chalk.git",
-  "author": "austindd",
+  "repository": "git@github.com:popstarfreas/rescript-chalk.git",
+  "author": "austindd & popstarfreas",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "npx bsb -make-world -w",
-    "build": "npx bsb -make-world",
-    "clean": "npx bsb -clean-world",
-    "clean-build": "npx bsb -clean-world && npx bsb -make-world",
-    "clean-start": "npx bsb -clean-world && npx bsb -make-world && npx bsb -w",
+    "build": "rescript",
+    "build:watch": "rescript build -w",
     "test": "jest"
   },
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.6.0",
-    "bs-platform": "^8.4.2"
+    "@glennsl/rescript-jest": "*",
+    "rescript": "^11.0.0"
   },
   "peerDependencies": {
-    "bs-platform": "^8.0.0"
+    "rescript": "^11.0.0"
   },
   "dependencies": {
     "chalk": "^4.1.0"

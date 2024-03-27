@@ -22,6 +22,6 @@
   },
   "bs-dependencies": [],
   "bs-dev-dependencies": [
-    "@glennsl/bs-jest"
+    "@glennsl/rescript-jest"
   ]
 }
