@@ -33,7 +33,7 @@ let level: t => option<level> = t => levelFromInt(levelRaw(t))
 let levelExn: t => level = t => {
   switch levelFromInt(levelRaw(t)) {
   | Some(x) => x
-  | None => raise(Failure("Chalk.level: Unexpected value for the color support level"))
+  | None => throw(Failure("Chalk.level: Unexpected value for the color support level"))
   }
 }
 

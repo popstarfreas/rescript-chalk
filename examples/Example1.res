@@ -5,4 +5,4 @@ let style = {
 
 let fancyText = Chalk.apply(style, "A picture is worth a thousand words")
 
-Js.log(fancyText)
+Console.log(fancyText)

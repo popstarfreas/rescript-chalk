@@ -6,7 +6,7 @@ type level =
   | @as(2) Enabled_256Color
   | @as(3) Enabled_TrueColor
 
-@module external chalk: t = "chalk"
+let chalk: t
 
 let levelFromInt: int => option<level>
 let levelToInt: level => int

@@ -1,15 +1,14 @@
 {
   "name": "rescript-chalk",
   "version": "1.0.0",
+  "package-specs": {
+    "module": "es6",
+    "in-source": false
+  },
   "sources": [
     {
       "dir": "src",
       "subdirs": true
-    },
-    {
-      "dir": "test",
-      "subdirs": true,
-      "type": "dev"
     },
     {
       "dir": "examples",
@@ -20,8 +19,5 @@
   "warnings": {
     "error": "+101"
   },
-  "bs-dependencies": [],
-  "bs-dev-dependencies": [
-    "@glennsl/rescript-jest"
-  ]
+  "dependencies": []
 }

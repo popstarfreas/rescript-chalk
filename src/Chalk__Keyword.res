@@ -319,18 +319,18 @@ module Impl = {
       #yellowgreen,
     ]
 
-    let __dict = Js.Dict.empty()
+    let __dict = Dict.make()
     let __bottomIndex = 0
     let __topIndex = Belt.Array.length(__array) - 1
 
     for i in __bottomIndex to __topIndex {
-      Js.Dict.set(__dict, toString(Belt.Array.getUnsafe(__array, i)), i)
+      Dict.set(__dict, toString(Belt.Array.getUnsafe(__array, i)), i)
     }
   }
 
   let fromString = str => {
     open Internal
-    switch Js.Dict.get(__dict, str) {
+    switch Dict.get(__dict, str) {
     | None => None
     | Some(index) => Some(Belt.Array.getUnsafe(__array, index))
     }
