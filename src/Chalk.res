@@ -24,7 +24,7 @@ let levelToInt = l =>
 
 type instanceOptions = {level: int}
 
-@module external chalk: t = "chalk"
+@module("chalk") external chalk: t = "default"
 
 @get external levelRaw: t => int = "level"
 
